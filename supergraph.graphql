@@ -23,12 +23,14 @@ directive @link(url: String, as: String, for: link__Purpose, import: [link__Impo
 type Instrument
   @join__type(graph: INSTRUMENTS, key: "symbologyId")
   @join__type(graph: SYMBOLOGY, key: "symbologyId")
+  @join__type(graph: TIMESERIES, key: "symbologyId")
   @join__type(graph: WATCHLISTS, key: "symbologyId")
 {
   symbologyId: ID!
   name: String! @join__field(graph: INSTRUMENTS)
   price: Float! @join__field(graph: INSTRUMENTS)
   symbology: Symbology! @join__field(graph: SYMBOLOGY)
+  timeseries: TimeSeries! @join__field(graph: TIMESERIES)
 }
 
 scalar join__FieldSet
@@ -36,6 +38,7 @@ scalar join__FieldSet
 enum join__Graph {
   INSTRUMENTS @join__graph(name: "instruments", url: "http://localhost:4002")
   SYMBOLOGY @join__graph(name: "symbology", url: "http://localhost:4001")
+  TIMESERIES @join__graph(name: "timeseries", url: "http://localhost:4004")
   WATCHLISTS @join__graph(name: "watchlists", url: "http://localhost:4003")
 }
 
@@ -65,6 +68,7 @@ type Mutation
 type Query
   @join__type(graph: INSTRUMENTS)
   @join__type(graph: SYMBOLOGY)
+  @join__type(graph: TIMESERIES)
   @join__type(graph: WATCHLISTS)
 {
   instrument(id: ID!): Instrument @join__field(graph: INSTRUMENTS)
@@ -101,6 +105,24 @@ enum SymbologyType
   ISIN @join__enumValue(graph: INSTRUMENTS) @join__enumValue(graph: SYMBOLOGY) @join__enumValue(graph: WATCHLISTS)
   VALOR @join__enumValue(graph: INSTRUMENTS) @join__enumValue(graph: SYMBOLOGY) @join__enumValue(graph: WATCHLISTS)
   FIGI @join__enumValue(graph: INSTRUMENTS) @join__enumValue(graph: SYMBOLOGY) @join__enumValue(graph: WATCHLISTS)
+}
+
+type TimeSeries
+  @join__type(graph: TIMESERIES)
+{
+  symbologyId: ID!
+  timestamps: [String!]!
+  metrics: TimeSeriesMetrics!
+}
+
+type TimeSeriesMetrics
+  @join__type(graph: TIMESERIES)
+{
+  open: [Float!]
+  high: [Float!]
+  low: [Float!]
+  close: [Float!]
+  volume: [Int!]
 }
 
 type Watchlist

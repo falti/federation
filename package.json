@@ -16,8 +16,9 @@
     "start:symbology": "nodemon src/symbology/index.ts",
     "start:instruments": "nodemon src/instruments/index.ts",
     "start:watchlists": "nodemon src/watchlists/index.ts",
+    "start:timeseries": "nodemon src/timeseries/index.ts",
     "start:gateway": "nodemon src/gateway.ts",    
-    "start": "concurrently \"yarn start:symbology\" \"yarn start:instruments\" \"yarn start:watchlists\" \"yarn start:gateway\""
+    "start": "concurrently \"yarn start:symbology\" \"yarn start:instruments\" \"yarn start:watchlists\" \"yarn start:timeseries\" \"yarn start:gateway\""
   },
   "dependencies": {
     "@apollo/federation": "^0.38.1",
