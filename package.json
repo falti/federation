@@ -1,0 +1,31 @@
+{
+  "devDependencies": {
+    "@apollo/rover": "^0.29.1",
+    "@types/node": "^22.15.14",
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "yarn": "^1.22.22"
+  },
+  "name": "yarn",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start:symbology": "nodemon src/symbology/index.ts",
+    "start:instruments": "nodemon src/instruments/index.ts",
+    "start:watchlists": "nodemon src/watchlists/index.ts",
+    "start:gateway": "nodemon src/gateway.ts",    
+    "start": "concurrently \"yarn start:symbology\" \"yarn start:instruments\" \"yarn start:watchlists\" \"yarn start:gateway\""
+  },
+  "dependencies": {
+    "@apollo/federation": "^0.38.1",
+    "@apollo/gateway": "^2.10.2",
+    "@apollo/server": "^4.12.0",
+    "@apollo/subgraph": "^2.10.2",
+    "dataloader": "^2.2.3",
+    "graphql": "^16.11.0",
+    "graphql-tag": "^2.12.6"
+  }
+}

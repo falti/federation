@@ -1,0 +1,127 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type Instrument
+  @join__type(graph: INSTRUMENTS, key: "symbologyId")
+  @join__type(graph: SYMBOLOGY, key: "symbologyId")
+  @join__type(graph: WATCHLISTS, key: "symbologyId")
+{
+  symbologyId: ID!
+  name: String! @join__field(graph: INSTRUMENTS)
+  price: Float! @join__field(graph: INSTRUMENTS)
+  symbology: Symbology! @join__field(graph: SYMBOLOGY)
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  INSTRUMENTS @join__graph(name: "instruments", url: "http://localhost:4002")
+  SYMBOLOGY @join__graph(name: "symbology", url: "http://localhost:4001")
+  WATCHLISTS @join__graph(name: "watchlists", url: "http://localhost:4003")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Mutation
+  @join__type(graph: WATCHLISTS)
+{
+  createWatchlist(name: String!): Watchlist!
+  addToWatchlist(id: ID!, items: [WatchlistItemInput!]!): Watchlist!
+  removeFromWatchlist(id: ID!, items: [ID!]!): Watchlist!
+  deleteWatchlist(id: ID!): Boolean!
+}
+
+type Query
+  @join__type(graph: INSTRUMENTS)
+  @join__type(graph: SYMBOLOGY)
+  @join__type(graph: WATCHLISTS)
+{
+  instrument(id: ID!): Instrument @join__field(graph: INSTRUMENTS)
+  instruments: [Instrument!]! @join__field(graph: INSTRUMENTS)
+  symbology(symbol: String!, type: SymbologyType!): Symbology @join__field(graph: SYMBOLOGY)
+  instrumentBySymbol(symbol: String!, type: SymbologyType!): Instrument @join__field(graph: SYMBOLOGY)
+  watchlist(id: ID!): Watchlist @join__field(graph: WATCHLISTS)
+  watchlists: [Watchlist!]! @join__field(graph: WATCHLISTS)
+}
+
+type Symbol
+  @join__type(graph: INSTRUMENTS)
+  @join__type(graph: SYMBOLOGY)
+  @join__type(graph: WATCHLISTS)
+{
+  symbol: String!
+  type: SymbologyType!
+}
+
+type Symbology
+  @join__type(graph: INSTRUMENTS, key: "id")
+  @join__type(graph: SYMBOLOGY, key: "id")
+  @join__type(graph: WATCHLISTS, key: "id")
+{
+  id: ID! @join__field(graph: INSTRUMENTS) @join__field(graph: SYMBOLOGY) @join__field(graph: WATCHLISTS, external: true)
+  symbols: [Symbol!]!
+}
+
+enum SymbologyType
+  @join__type(graph: INSTRUMENTS)
+  @join__type(graph: SYMBOLOGY)
+  @join__type(graph: WATCHLISTS)
+{
+  ISIN @join__enumValue(graph: INSTRUMENTS) @join__enumValue(graph: SYMBOLOGY) @join__enumValue(graph: WATCHLISTS)
+  VALOR @join__enumValue(graph: INSTRUMENTS) @join__enumValue(graph: SYMBOLOGY) @join__enumValue(graph: WATCHLISTS)
+  FIGI @join__enumValue(graph: INSTRUMENTS) @join__enumValue(graph: SYMBOLOGY) @join__enumValue(graph: WATCHLISTS)
+}
+
+type Watchlist
+  @join__type(graph: WATCHLISTS)
+{
+  id: ID!
+  name: String
+  items: [WatchlistItem!]!
+}
+
+type WatchlistItem
+  @join__type(graph: WATCHLISTS)
+{
+  id: ID!
+  symbologyId: ID!
+  instrument: Instrument!
+}
+
+input WatchlistItemInput
+  @join__type(graph: WATCHLISTS)
+{
+  symbol: String!
+  type: SymbologyType!
+}
