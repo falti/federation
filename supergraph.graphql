@@ -22,6 +22,7 @@ directive @link(url: String, as: String, for: link__Purpose, import: [link__Impo
 
 type Instrument
   @join__type(graph: INSTRUMENTS, key: "symbologyId")
+  @join__type(graph: SEARCH, key: "symbologyId")
   @join__type(graph: SYMBOLOGY, key: "symbologyId")
   @join__type(graph: TIMESERIES, key: "symbologyId")
   @join__type(graph: WATCHLISTS, key: "symbologyId")
@@ -37,6 +38,7 @@ scalar join__FieldSet
 
 enum join__Graph {
   INSTRUMENTS @join__graph(name: "instruments", url: "http://localhost:4002")
+  SEARCH @join__graph(name: "search", url: "http://localhost:4005")
   SYMBOLOGY @join__graph(name: "symbology", url: "http://localhost:4001")
   TIMESERIES @join__graph(name: "timeseries", url: "http://localhost:4004")
   WATCHLISTS @join__graph(name: "watchlists", url: "http://localhost:4003")
@@ -67,16 +69,27 @@ type Mutation
 
 type Query
   @join__type(graph: INSTRUMENTS)
+  @join__type(graph: SEARCH)
   @join__type(graph: SYMBOLOGY)
   @join__type(graph: TIMESERIES)
   @join__type(graph: WATCHLISTS)
 {
   instrument(id: ID!): Instrument @join__field(graph: INSTRUMENTS)
   instruments: [Instrument!]! @join__field(graph: INSTRUMENTS)
+  search(query: String!): [SearchResult!]! @join__field(graph: SEARCH)
   symbology(symbol: String!, type: SymbologyType!): Symbology @join__field(graph: SYMBOLOGY)
   instrumentBySymbol(symbol: String!, type: SymbologyType!): Instrument @join__field(graph: SYMBOLOGY)
   watchlist(id: ID!): Watchlist @join__field(graph: WATCHLISTS)
   watchlists: [Watchlist!]! @join__field(graph: WATCHLISTS)
+}
+
+type SearchResult
+  @join__type(graph: SEARCH)
+{
+  symbologyId: ID!
+  rank: Float!
+  lastUpdated: String!
+  instrument: Instrument!
 }
 
 type Symbol
