@@ -45,11 +45,7 @@ export const resolvers = {
       console.log('Resolving symbology reference:', reference);
       // Find the record by id
       return simulatedDatabase.find((record) => record.id === reference.id);
-    },
-    instrument: (symbology: { id: string }) => {
-      // Return a reference to the Instrument using the same ID
-      return { __typename: 'Instrument', id: symbology.id };
-    },
+    }
   },
   Instrument: {
     symbology: (instrument: { symbologyId: string }) => {
